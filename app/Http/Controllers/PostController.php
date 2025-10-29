@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Report;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
@@ -10,6 +11,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\Like;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth; // Import the Auth facade
+
+
 class PostController extends Controller
 {
     public function index(Request $request)
@@ -78,24 +83,19 @@ class PostController extends Controller
             $validated['image'] = $request->file('image')->store('postimagenew', 'public');
         }
 
-        DB::transaction(function () use ($validated) {
-            Log::info('Insert data into post table:', [
-                'user_id' => auth()->id(),
+        DB::transaction(function () use ($validated) { // Use Auth::id() for clarity and consistency
+            $postData = [
+                'user_id' => Auth::id(), // Use Auth::id() to get the authenticated user's ID
                 'title' => $validated['title'],
                 'content' => $validated['content'],
                 'category_id' => $validated['category_id'],
                 'image' => $validated['image'] ?? null,
                 'status' => 'active',
-            ]);
+            ];
 
-            DB::table('posts')->insert([
-                'user_id' => auth()->id(),
-                'title' => $validated['title'],
-                'content' => $validated['content'],
-                'category_id' => $validated['category_id'],
-                'image' => $validated['image'] ?? null,
-                'status' => 'active',
-            ]);
+            Log::info('Creating new post:', $postData);
+
+            Post::create($postData); // Use the Eloquent model for creation
         });
 
         return redirect('/sontana/posts')->with('success', 'Post created!');
@@ -169,21 +169,21 @@ class PostController extends Controller
 
     public function destroy($id)
     {
-       
-    DB::transaction(function () use ($id) {
-        $post = Post::with(['comments', 'reports', 'likes'])->findOrFail($id);
 
-        // ลบไลก์ที่เกี่ยวข้อง
-        Like::where('post_id', $id)->delete();
+        DB::transaction(function () use ($id) {
+            $post = Post::with(['comments', 'reports', 'likes'])->findOrFail($id);
 
-        // ลบ reports ที่เกี่ยวข้อง
-        Report::where('post_id', $id)->delete();
+            // ลบไลก์ที่เกี่ยวข้อง
+            Like::where('post_id', $id)->delete();
 
-        // ลบคอมเมนต์ที่เกี่ยวข้อง
-        $post->comments()->delete();
+            // ลบ reports ที่เกี่ยวข้อง
+            Report::where('post_id', $id)->delete();
 
-        // ลบโพสต์
-        $post->delete();
+            // ลบคอมเมนต์ที่เกี่ยวข้อง
+            $post->comments()->delete();
+
+            // ลบโพสต์
+            $post->delete();
         });
 
         return redirect()->route('post.index')->with('success', 'Post deleted successfully!');
@@ -193,10 +193,7 @@ class PostController extends Controller
     {
         $post = Post::findOrFail($id);
         $post->increment('views'); // เพิ่มค่า views +1
-    
+
         return redirect()->route('post.show', ['id' => $id]);
     }
-
-    
-    
 }
