@@ -4,13 +4,16 @@ import SideNavFront from "@/Components/SideNavBarFront";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 
 export default function PostIndex() {
-    const { posts, categories, currentSort, selectedCategory } = usePage().props;
+    const { posts, categories, currentSort, selectedCategory } =
+        usePage().props;
     const [sortOrder, setSortOrder] = useState(currentSort);
 
     const handleSortChange = () => {
         const newSortOrder = sortOrder === "desc" ? "asc" : "desc";
         setSortOrder(newSortOrder);
-        window.location.search = `?sort=${newSortOrder}&category_id=${selectedCategory?.id || ""}`;
+        window.location.search = `?sort=${newSortOrder}&category_id=${
+            selectedCategory?.id || ""
+        }`;
     };
 
     return (
@@ -29,18 +32,25 @@ export default function PostIndex() {
                 {sortOrder === "desc" ? "Newest First" : "Oldest First"}
             </button>
 
-            <div className="flex justify-center items-center min-h-screen bg-gray-100 p-5">
+            <div className="flex justify-center items-start min-h-screen bg-gray-100 p-5 pt-16">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full max-w-7xl">
-                    <SideNavFront categories={categories} className="md:block hidden" />
+                    <SideNavFront
+                        categories={categories}
+                        className="md:block hidden"
+                    />
 
-                    <div className="bg-white p-6 mt-5 rounded-lg shadow-md col-span-3">
-                        <h1 className="text-2xl font-bold text-gray-800 mb-6">Blog Posts</h1>
+                    <div className="bg-white p-6 rounded-lg shadow-md col-span-3">
+                        <h1 className="text-2xl font-bold text-gray-800 mb-6">
+                            Blog Posts
+                        </h1>
 
                         {posts.length > 0 ? (
                             posts.map((post) => (
                                 <Link
                                     key={post.id}
-                                    href={route("post.incrementView", { id: post.id })}
+                                    href={route("post.incrementView", {
+                                        id: post.id,
+                                    })}
                                     className="block bg-white rounded-lg shadow-md p-6 mb-6 transition transform hover:shadow-lg"
                                 >
                                     {post.image && (
@@ -55,22 +65,29 @@ export default function PostIndex() {
                                         {post.title}
                                     </h2>
                                     <p className="italic text-gray-600">
-                                        <strong>Category:</strong> {post.category.name}
+                                        <strong>Category:</strong>{" "}
+                                        {post.category.name}
                                     </p>
                                     <p className="text-gray-700 leading-relaxed mb-4">
                                         {post.content}
                                     </p>
                                     <p className="text-gray-600">
-                                        <strong>Author:</strong> {post.user.name}
+                                        <strong>Author:</strong>{" "}
+                                        {post.user.name}
                                     </p>
-                                    <p className="text-gray-500">👁️ {post.views} </p>
+                                    <p className="text-gray-500">
+                                        👁️ {post.views}{" "}
+                                    </p>
                                     {/* แสดงยอด Like */}
-                                    <span className="text-gray-500">👍 {post.likes.length}</span>
-
+                                    <span className="text-gray-500">
+                                        👍 {post.likes.length}
+                                    </span>
                                 </Link>
                             ))
                         ) : (
-                            <p className="text-center text-gray-600">No posts available.</p>
+                            <p className="text-center text-gray-600">
+                                No posts available.
+                            </p>
                         )}
                     </div>
                 </div>

@@ -25,6 +25,7 @@
         "@inertiajs/inertia-react": "^0.8.1",
         "chart.js": "^4.4.7",
         "dayjs": "^1.11.13",
+        "lucide-react": "^0.552.0",
         "react-chartjs-2": "^5.3.0"
     }
 }

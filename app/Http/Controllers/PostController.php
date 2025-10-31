@@ -145,7 +145,7 @@ class PostController extends Controller
             if ($request->hasFile('image')) {
                 // ลบรูปภาพเก่าหากมี
                 if ($post->image) {
-                    \Storage::delete('public/' . $post->image); // ลบไฟล์เก่าจาก storage
+                    Storage::delete('public/' . $post->image); // ลบไฟล์เก่าจาก storage
                 }
 
                 // อัปโหลดรูปภาพใหม่และเก็บในตัวแปร image
